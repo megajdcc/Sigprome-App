@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Sisme</string>
+    <string name="Entrar">boton</string>
+    <string name="Contraseña">text_contraseña</string>
+    <string name="Cedula">txt_cedula</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notificaciones</string>
+    <string name="ipweb">http://sigprome.sytes.net:83/ServiceSigprome/Peticion.php?</string>
+    <!--<string name="ipweb">http://192.168.1.100</string>-->
+</resources>

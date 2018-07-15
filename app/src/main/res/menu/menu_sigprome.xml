@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".principal">
+
+    <item
+        android:id="@+id/noticacion"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/title_notifications"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/perfil"
+        android:title="Perfil"
+        app:showAsAction="never"
+        />
+        <!--android:icon="@android:drawable/"-->
+         />
+    <item
+        android:id="@+id/informacion"
+        android:icon="@android:drawable/ic_menu_help"
+        android:title="Acerca"
+        app:showAsAction="never"
+        />
+    <!--android:icon="@android:drawable/"-->
+    />
+    <item
+        android:id="@+id/salir"
+        android:title="Salir" />
+    <!--android:icon="@android:drawable/"-->
+    android:title="Salir" />
+
+
+    <!--<item-->
+        <!--android:id="@+id/navigation_dashboard"-->
+        <!--android:icon="@drawable/ic_dashboard_black_24dp"-->
+        <!--android:title="@string/title_dashboard" />-->
+
+
+
+
+</menu>
