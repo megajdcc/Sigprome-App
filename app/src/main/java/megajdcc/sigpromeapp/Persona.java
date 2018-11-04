@@ -1,5 +1,6 @@
 package megajdcc.sigpromeapp;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
@@ -7,6 +8,7 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
@@ -25,22 +27,90 @@ import static megajdcc.sigpromeapp.R.layout.principal;
  * Created by Jnatn'h on 3/5/2018.
  */
 
-public class Persona implements Response.Listener<JSONObject>,Response.ErrorListener{
+public class Persona{
 
+    ProgressDialog progreso;
     Persona(long cedula){
         Persona.cedula = cedula;
     }
     Persona(){}
     //Metodos propios}
-    public void capturarDatos(Context ct){
-        Context c = (Context) ct;
-        this.ct = c;
+    public void capturarDatos(final Context ct){
+        if(progreso == null){
+            progreso = new ProgressDialog(ct);
+            progreso.setMessage("Refrescando Datos");
+        }else {
+
+            progreso.setMessage("Filtrando Datos... ");
+        }
+        this.ct = ct;
         String donde = "InfPersonal";
-        String ipweb = ct.getString(R.string.ipweb);
-        String url = ipweb+"peticion=infopersona&cedulaperson="+Persona.getCedula()+"";
+        String ipweb = "http://www.megajdcc.com.ve/Sigprome/Peticion.php?";
+        String url = ipweb+"peticion=infopersona&cedulaperson="+Persona.cedula;
         System.out.println(url);
-        jrq = new JsonObjectRequest(Request.Method.GET,url,null,this,this);
-        Solicitud.getInstance(ct).addToRequestQueue(jrq);
+
+        Response.Listener<JSONObject> respo = new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONArray datosjson = response.optJSONArray("datos");
+                JSONObject objecjson;
+                try {
+                    objecjson = datosjson.getJSONObject(0);
+                    System.out.println(objecjson.length());
+                    Persona.setNombre(objecjson.optString("nombre"));
+                    Persona.setTipopersona(objecjson.optString("tipopersona"));
+                    Persona.setApellido(objecjson.optString("apellido"));
+                    String cedul = objecjson.optString("cedula");
+                    Persona.setCedula(Long.parseLong(cedul));
+                    Persona.setFechanacimiento(objecjson.optString("fechanac"));
+                    Persona.setTelefono(objecjson.optLong("telefono"));
+                    Persona.setDireccion(objecjson.optString("direccion"));
+                    char gen = objecjson.optString("genero").charAt(0);
+                    Persona.setGenero(gen);
+                    Persona.setCorreo(objecjson.getString("email"));
+                    tipopaciente = new TipoPersona(Persona.getTipopersona());
+                    progreso.hide();
+
+                    Toast.makeText(ct, "Bienvenido " + Persona.getNombre() + " " + Persona.getApellido(), Toast.LENGTH_SHORT).show();
+
+                    //  paciente= new Usuario(idus,this);
+
+
+                }catch(JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
+        Response.ErrorListener respo1  = new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                progreso.hide();
+                Toast.makeText(ct, "Se cayo la conexión "+error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                error.printStackTrace();
+            }
+        };
+
+
+        jrq = new JsonObjectRequest(Request.Method.GET,url,null,respo,respo1);
+        jrq.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 30000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 30000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
+        });
+        Solicitud.getInstance(this.ct).addToRequestQueue(jrq);
     }
 
     //Getters y Setters
@@ -131,7 +201,9 @@ public class Persona implements Response.Listener<JSONObject>,Response.ErrorList
     public static void setCorreo(String correo) {
         Persona.correo = correo;
     }
-
+    public void setProgress(ProgressDialog progress){
+        this.progreso = progress;
+    }
     //Campos de clases...
     private static int id,id_tipopersona;
     private static long cedula;
@@ -147,38 +219,8 @@ public class Persona implements Response.Listener<JSONObject>,Response.ErrorList
     private JsonRequest jrq;
 
 
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        Toast.makeText(this.ct, "Se cayo la conexión"+error.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void onResponse(JSONObject response) {
-        JSONArray datosjson = response.optJSONArray("datos");
-        JSONObject objecjson = null;
-        try {
-            objecjson = datosjson.getJSONObject(0);
-            System.out.println(objecjson.length());
-            Persona.setNombre(objecjson.optString("nombre"));
-            Persona.setTipopersona(objecjson.optString("tipopersona"));
-            Persona.setApellido(objecjson.optString("apellido"));
-            String cedul = objecjson.optString("cedula");
-            Persona.setCedula(Long.parseLong(cedul));
-            Persona.setFechanacimiento(objecjson.optString("fechanacimiento"));
-            Persona.setTelefono(objecjson.optLong("telefono"));
-            Persona.setDireccion(objecjson.optString("direccion"));
-            char gen = objecjson.optString("sexo").charAt(0);
-            Persona.setGenero(gen);
-            Persona.setCorreo(objecjson.getString("correo"));
-            tipopaciente = new TipoPersona(Persona.getTipopersona());
-            Toast.makeText(ct, "Bienvenido " + Persona.getNombre() + " " + Persona.getApellido(), Toast.LENGTH_SHORT).show();
-
-            //  paciente= new Usuario(idus,this);
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
 
-    }
+
 }

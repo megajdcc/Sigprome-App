@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/fondo"
     android:minHeight="0dp"
+    android:orientation="vertical"
     tools:context=".Servicios"
     tools:layout_editor_absoluteY="25dp">
 
@@ -34,9 +35,9 @@
             android:layout_weight="1"
             android:fontFamily="serif"
             android:gravity="center_vertical|center"
-            android:text="Servicios administrativos:"
+            android:text="Tramites activos:"
             android:textColor="@color/negro"
-            android:textSize="18sp"
+            android:textSize="14sp"
             android:textStyle="bold|italic"
             android:typeface="serif" />
     </LinearLayout>

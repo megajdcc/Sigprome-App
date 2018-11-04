@@ -32,6 +32,9 @@
         <activity android:name=".Historial">
 
         </activity>
+        <activity android:name=".Cita">
+
+        </activity>
 
     </application>
 

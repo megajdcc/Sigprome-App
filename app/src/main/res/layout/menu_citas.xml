@@ -5,4 +5,4 @@
     android:background="@color/principalBtn"
     android:navigationIcon="@android:drawable/ic_menu_revert">
 
-    </android.support.v7.widget.Toolbar>
+</android.support.v7.widget.Toolbar>

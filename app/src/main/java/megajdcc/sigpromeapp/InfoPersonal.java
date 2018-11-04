@@ -1,6 +1,7 @@
 package megajdcc.sigpromeapp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,11 +15,13 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.JsonRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -32,6 +35,7 @@ public class InfoPersonal extends AppCompatActivity implements Response.Listener
     //RequestQueue request;
     JsonRequest jrq;
     private Toolbar menu;
+    ProgressDialog progreso;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,13 +129,35 @@ public class InfoPersonal extends AppCompatActivity implements Response.Listener
         });
     }
     public void grabar(){
+        progreso = new ProgressDialog(this);
+        progreso.setMessage("Registrando.");
+        progreso.setCancelable(false);
+        progreso.setCanceledOnTouchOutside(false);
+        progreso.show();
         correo  = (EditText) findViewById(R.id.correo);
         String corr = correo.getText().toString();
         telf = (EditText) findViewById(R.id.telefono);
         Long telfono = Long.parseLong(telf.getText().toString());
         ipweb = getString(R.string.ipweb);
         String url = ipweb+"peticion=modifperson&cedulperson="+Persona.getCedula()+"&telefono="+telfono+"&correo="+corr+"";
+        System.out.println(url);
         jrq = new JsonObjectRequest(Request.Method.GET,url,null,this,this);
+        jrq.setRetryPolicy(new RetryPolicy() {
+            @Override
+            public int getCurrentTimeout() {
+                return 2000;
+            }
+
+            @Override
+            public int getCurrentRetryCount() {
+                return 10000;
+            }
+
+            @Override
+            public void retry(VolleyError error) throws VolleyError {
+
+            }
+        });
 //        this.request.add(jrq);
         Solicitud.getInstance(this).addToRequestQueue(jrq);
     }
@@ -156,6 +182,7 @@ public class InfoPersonal extends AppCompatActivity implements Response.Listener
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        progreso.hide();
         Toast.makeText(this, "No se pudo actualizar los datos personales", Toast.LENGTH_SHORT).show();
     }
 
@@ -163,6 +190,7 @@ public class InfoPersonal extends AppCompatActivity implements Response.Listener
     public void onResponse(JSONObject response) {
         Persona perso = new Persona(Persona.getCedula());
         perso.capturarDatos(this);
+        progreso.hide();
         Toast.makeText(this, "Datos personales modificados", Toast.LENGTH_SHORT).show();
     }
 }
